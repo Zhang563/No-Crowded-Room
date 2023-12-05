@@ -98,9 +98,17 @@ private:
         return CRGB(255 - y * 255 / MATRIX_HEIGHT, y * 255 / MATRIX_HEIGHT, 0);
     }
 
+    // int xyToIndex(int x, int y) {
+    //     return y % 2 == 0 ? y * MATRIX_WIDTH + x : (y + 1) * MATRIX_WIDTH - x - 1;
+    // }
     int xyToIndex(int x, int y) {
-        return y % 2 == 0 ? y * MATRIX_WIDTH + x : (y + 1) * MATRIX_WIDTH - x - 1;
-    }
+    // Rotate 90 degrees clockwise
+    int newX = y;
+    int newY = MATRIX_WIDTH - x - 1;
+
+    return newY % 2 == 0 ? newY * MATRIX_HEIGHT + newX : (newY + 1) * MATRIX_HEIGHT - newX - 1;
+}
+
 };
 
 LEDMatrix matrix;
