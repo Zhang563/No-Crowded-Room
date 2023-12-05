@@ -13,8 +13,12 @@ CRGB leds[NUM_LEDS];
 LiquidCrystal_I2C lcd(0x27,16,2);
 
 volatile int count = 0;
+volatile unsigned long lastSensor1ActiveTime = 0;
+volatile unsigned long lastSensor2ActiveTime = 0;
+unsigned long desiredLoopTime = 200; // etc
+unsigned long lastLoopStartTime = 0;
+const unsigned long sensorTimeout = 500; //etc
 const int MAX_OCCUPANCY = 64;
-const int threshold = 128; // Assuming a 0-1023 analog read range, 512 is approximately 2.5V.
 
 // Previous readings to detect a change.
 int lastReadingA2 = 0;
@@ -152,7 +156,10 @@ private:
 };
 
 LEDMatrix matrix;
-
+bool sensorTriggered() {
+    // Return true if any sensor interrupt has occurred
+    return sensor1Active || sensor2Active;
+}
 void setup() {
   lcd.init(); 
   lcd.backlight();
@@ -169,25 +176,8 @@ void setup() {
 }
 
 void loop() {
-  // int currentReadingA2 = analogRead(A2);
-  // int currentReadingA3 = analogRead(A3);
-
-  // // Check if someone has passed from A2 to A3
-  // if (lastReadingA2 < threshold && currentReadingA2 >= threshold && currentReadingA3 < threshold) {
-  //   count++;
-  //   // Delay to avoid counting the same person multiple times.
-  //   delay(100);
-  // }
-  // // Check if someone has passed from A3 to A2
-  // if (lastReadingA3 < threshold && currentReadingA3 >= threshold && currentReadingA2 < threshold) {
-  //   count--;
-  //   // Delay to avoid counting the same person multiple times.
-  //   delay(100);
-  // }
-
-  // // Update the last readings.
-  // lastReadingA2 = currentReadingA2;
-  // lastReadingA3 = currentReadingA3;
+  unsigned long loopStartTime = millis();
+  unsigned long processingTime = loopStartTime - lastLoopStartTime;
   lcd.clear();
 //   count += random(-25, 20);
 
@@ -199,34 +189,56 @@ void loop() {
   lcd.print("Occupancy Count:");
   lcd.setCursor(0, 1); // Start at character 0 on line 1
   lcd.print(count);
+    unsigned long currentMillis = millis();
+    if (sensor1Active && (currentMillis - lastSensor1ActiveTime > sensorTimeout)) {
+        sensor1Active = false;
+    }
+    if (sensor2Active && (currentMillis - lastSensor2ActiveTime > sensorTimeout)) {
+        sensor2Active = false;
+    }
 // Calculate the number of LEDs to display based on the occupancy count
-int d = (int)((float)count / MAX_OCCUPANCY * NUM_LEDS);
+    int d = (int)((float)count / MAX_OCCUPANCY * NUM_LEDS);
     if(d>=0 && d <= NUM_LEDS){
       matrix.displayOccupancy(d); // Simulate adding and removing drops
-      delay(1000); // Pause before the next loop iteration
+      //delay(1000); // Pause before the next loop iteration
     }
+     unsigned long dynamicDelay = (processingTime < desiredLoopTime) ? (desiredLoopTime - processingTime) : 0;
+     // Non-blocking delay
+    unsigned long delayStartTime = millis();
+    while (millis() - delayStartTime < dynamicDelay) {
+        if (sensorTriggered()) { // sensorTriggered() checks if any sensor was triggered
+            break; // Exit delay loop if sensor is triggered
+        }
+    }
+
+    // Update last loop start time
+    lastLoopStartTime = loopStartTime;
 }
 // Interrupt Service Routines
 void sensor1() {
-  if ((millis() - lastInterruptTime) > 50) { // 50 ms debounce period
-    if(sensor2Active){
-      count++; // Increment count as someone has moved from sensor 2 to sensor 1
-      sensor2Active = false;
-    }else{
-      sensor1Active = true;
+    unsigned long currentMillis = millis();
+    if (currentMillis - lastInterruptTime > 25) {
+        if (sensor2Active) {
+            count++;
+            sensor2Active = false;
+        } else {
+            sensor1Active = true;
+            lastSensor1ActiveTime = currentMillis;
+        }
+        lastInterruptTime = currentMillis;
     }
-    lastInterruptTime = millis();
-  }
 }
 
 void sensor2() {
-  if ((millis() - lastInterruptTime) > 50) { // 50 ms debounce period
-    if(sensor1Active){
-      count--; // Decrement count as someone has moved from sensor 1 to sensor 2
-      sensor1Active = false;
-    }else{
-      sensor2Active = true;
+    unsigned long currentMillis = millis();
+    if (currentMillis - lastInterruptTime > 25) {
+        if (sensor1Active) {
+            count--;
+            sensor1Active = false;
+        } else {
+            sensor2Active = true;
+            lastSensor2ActiveTime = currentMillis;
+        }
+        lastInterruptTime = currentMillis;
     }
-    lastInterruptTime = millis();
-  }
 }
