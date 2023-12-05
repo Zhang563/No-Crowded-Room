@@ -29,6 +29,8 @@ public:
         FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
         FastLED.setBrightness(BRIGHTNESS);
         memset(ledState, 0, sizeof(ledState));
+        sequencePosition = -1; // Initialize sequencePosition to -1
+        initializeRoundRobinSequence();
     }
 
     void displayOccupancy(int count) {
@@ -46,8 +48,46 @@ private:
     bool ledState[MATRIX_WIDTH][MATRIX_HEIGHT];
     int numDrops = 0;
 
+    
+    int roundRobinSequence[MATRIX_WIDTH];
+    int sequencePosition = -1;
+
+    void initializeRoundRobinSequence() {
+        for (int i = 0; i < MATRIX_WIDTH; ++i) {
+            roundRobinSequence[i] = i;
+        }
+        shuffleSequence();
+    }
+
+    void shuffleSequence() {
+        for (int i = MATRIX_WIDTH - 1; i > 0; --i) {
+            int j = random(i + 1);
+            int temp = roundRobinSequence[i];
+            roundRobinSequence[i] = roundRobinSequence[j];
+            roundRobinSequence[j] = temp;
+        }
+    }
+
+    int getNextColumnForAdd() {
+          sequencePosition++;
+      if (sequencePosition >= MATRIX_WIDTH) {
+          shuffleSequence();
+          sequencePosition = 0;
+      }
+      return roundRobinSequence[sequencePosition];
+    }
+
+    int getNextColumnForRemove() {
+          if (sequencePosition < 0) {
+          shuffleSequence();
+          sequencePosition = MATRIX_WIDTH-1;
+      }
+      return roundRobinSequence[sequencePosition--];
+    }
+    
+
     void addDrop() {
-        int col = random(MATRIX_WIDTH);
+        int col = getNextColumnForAdd();
         int row = findFirstEmptyRow(col);
         if (row != -1) {
             animateDrop(col, row, true);
@@ -57,7 +97,7 @@ private:
     }
 
     void removeDrop() {
-        int col = random(MATRIX_WIDTH);
+        int col = getNextColumnForRemove();
         int row = findLowestOccupiedRow(col);
         if (row != -1) {
             animateDrop(col, row, false);
@@ -190,4 +230,3 @@ void sensor2() {
     lastInterruptTime = millis();
   }
 }
-
