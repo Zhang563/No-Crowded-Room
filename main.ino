@@ -20,10 +20,6 @@ unsigned long lastLoopStartTime = 0;
 const unsigned long sensorTimeout = 500; //etc
 const int MAX_OCCUPANCY = 64;
 
-// Previous readings to detect a change.
-int lastReadingA2 = 0;
-int lastReadingA3 = 0;
-
 volatile unsigned long lastInterruptTime = 0;
 volatile bool sensor2Active = false;
 volatile bool sensor1Active = false;
@@ -141,7 +137,7 @@ private:
     CRGB calculateColor(int y) {
         return CRGB(255 - y * 255 / MATRIX_HEIGHT, y * 255 / MATRIX_HEIGHT, 0);
     }
-
+    //orientation configuration ===
     // int xyToIndex(int x, int y) {
     //     return y % 2 == 0 ? y * MATRIX_WIDTH + x : (y + 1) * MATRIX_WIDTH - x - 1;
     // }
@@ -165,24 +161,21 @@ void setup() {
   lcd.backlight();
   pinMode(2, INPUT);
   pinMode(3, INPUT);
-  // pinMode(A2, INPUT);
-  // pinMode(A3, INPUT);
-  
+
   attachInterrupt(digitalPinToInterrupt(2), sensor1, RISING);
   attachInterrupt(digitalPinToInterrupt(3), sensor2, RISING);
-  delay(3000);
-  count = 20;
-  matrix.displayOccupancy(50);
+
+  count = 20; //initial count value for simulation
+  //matrix.displayOccupancy(50);
 }
 
 void loop() {
   unsigned long loopStartTime = millis();
   unsigned long processingTime = loopStartTime - lastLoopStartTime;
   lcd.clear();
-//   count += random(-25, 20);
+//   count += random(-25, 20);  //automated testing
 
-// // Clamp the count to be within the range of 0 to MAX_OCCUPANCY
-//   count = max(0, min(count, MAX_OCCUPANCY));
+
   lcd.backlight();
 
   lcd.setCursor(0, 0); // Start at character 0 on line 0
@@ -196,14 +189,20 @@ void loop() {
     if (sensor2Active && (currentMillis - lastSensor2ActiveTime > sensorTimeout)) {
         sensor2Active = false;
     }
+// Clamp the count to be within the range of 0 to MAX_OCCUPANCY
+   count = max(0, min(count, MAX_OCCUPANCY));
+    // if (count < 0) {
+    //     count = 0;
+    // } else if (count > MAX_OCCUPANCY) {
+    //     count = MAX_OCCUPANCY;
+    // }
 // Calculate the number of LEDs to display based on the occupancy count
     int d = (int)((float)count / MAX_OCCUPANCY * NUM_LEDS);
     if(d>=0 && d <= NUM_LEDS){
-      matrix.displayOccupancy(d); // Simulate adding and removing drops
-      //delay(1000); // Pause before the next loop iteration
+      matrix.displayOccupancy(d); 
     }
-     unsigned long dynamicDelay = (processingTime < desiredLoopTime) ? (desiredLoopTime - processingTime) : 0;
-     // Non-blocking delay
+    // Non-blocking delay
+    unsigned long dynamicDelay = (processingTime < desiredLoopTime) ? (desiredLoopTime - processingTime) : 0;
     unsigned long delayStartTime = millis();
     while (millis() - delayStartTime < dynamicDelay) {
         if (sensorTriggered()) { // sensorTriggered() checks if any sensor was triggered
