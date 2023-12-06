@@ -12,17 +12,17 @@
 CRGB leds[NUM_LEDS];
 LiquidCrystal_I2C lcd(0x27,16,2);
 
-volatile int count = 0;
-volatile unsigned long lastSensor1ActiveTime = 0;
-volatile unsigned long lastSensor2ActiveTime = 0;
-unsigned long desiredLoopTime = 200; // etc
-unsigned long lastLoopStartTime = 0;
 const unsigned long sensorTimeout = 500; //etc
 const int MAX_OCCUPANCY = 64;
 
+volatile int count = 0;
 volatile unsigned long lastInterruptTime = 0;
 volatile bool sensor2Active = false;
 volatile bool sensor1Active = false;
+volatile unsigned long lastSensor1ActiveTime = 0;
+volatile unsigned long lastSensor2ActiveTime = 0;
+volatile bool change = true;
+
 class LEDMatrix {
 public:
     LEDMatrix() {
@@ -176,6 +176,8 @@ bool sensorTriggered() {
 void setup() {
   lcd.init(); 
   lcd.backlight();
+  lcd.clear();
+
   pinMode(2, INPUT);
   pinMode(3, INPUT);
 
@@ -187,48 +189,28 @@ void setup() {
 }
 
 void loop() {
-  unsigned long loopStartTime = millis();
-  unsigned long processingTime = loopStartTime - lastLoopStartTime;
-  lcd.clear();
-//   count += random(-25, 20);  //automated testing
-
-
-  lcd.backlight();
-
-  lcd.setCursor(0, 0); // Start at character 0 on line 0
-  lcd.print("Occupancy Count:");
-  lcd.setCursor(0, 1); // Start at character 0 on line 1
-  lcd.print(count);
-    unsigned long currentMillis = millis();
+  unsigned long currentMillis = millis();
     if (sensor1Active && (currentMillis - lastSensor1ActiveTime > sensorTimeout)) {
         sensor1Active = false;
     }
     if (sensor2Active && (currentMillis - lastSensor2ActiveTime > sensorTimeout)) {
         sensor2Active = false;
     }
-// Clamp the count to be within the range of 0 to MAX_OCCUPANCY
-   count = max(0, min(count, MAX_OCCUPANCY));
-    // if (count < 0) {
-    //     count = 0;
-    // } else if (count > MAX_OCCUPANCY) {
-    //     count = MAX_OCCUPANCY;
-    // }
-// Calculate the number of LEDs to display based on the occupancy count
-    int d = (int)((float)count / MAX_OCCUPANCY * NUM_LEDS);
-    if(d>=0 && d <= NUM_LEDS){
-      matrix.displayOccupancy(d); 
-    }
-    // Non-blocking delay
-    unsigned long dynamicDelay = (processingTime < desiredLoopTime) ? (desiredLoopTime - processingTime) : 0;
-    unsigned long delayStartTime = millis();
-    while (millis() - delayStartTime < dynamicDelay) {
-        if (sensorTriggered()) { // sensorTriggered() checks if any sensor was triggered
-            break; // Exit delay loop if sensor is triggered
+    if(change){ //update display when new value
+        lcd.clear();
+        lcd.setCursor(0, 0); // Start at character 0 on line 0
+        lcd.print("Occupancy Count:");
+        lcd.setCursor(0, 1); // Start at character 0 on line 1
+        lcd.print(count);
+        // Clamp the count to be within the range of 0 to MAX_OCCUPANCY
+        count = max(0, min(count, MAX_OCCUPANCY));
+        // Calculate the number of LEDs to display based on the occupancy count
+        int d = (int)((float)count / MAX_OCCUPANCY * NUM_LEDS);
+        if(d>=0 && d <= NUM_LEDS){
+          matrix.displayOccupancy(d); 
         }
+        change = false; //reset change flag
     }
-
-    // Update last loop start time
-    lastLoopStartTime = loopStartTime;
 }
 // Interrupt Service Routines
 void sensor1() {
@@ -237,6 +219,7 @@ void sensor1() {
         if (sensor2Active) {
             count++;
             sensor2Active = false;
+            change = true;
         } else {
             sensor1Active = true;
             lastSensor1ActiveTime = currentMillis;
@@ -251,6 +234,7 @@ void sensor2() {
         if (sensor1Active) {
             count--;
             sensor1Active = false;
+            change = true;
         } else {
             sensor2Active = true;
             lastSensor2ActiveTime = currentMillis;
