@@ -124,15 +124,32 @@ private:
         return -1;
     }
 
-    void animateDrop(int col, int endRow, bool adding) {
-        int step = adding ? 1 : -1;
-        for (int row = (adding ? 0 : endRow); adding ? (row <= endRow) : (row >= 0); row += step) {
-            int index = xyToIndex(col, row);
-            leds[index] = adding ? calculateColor(row) : CRGB::Black;
-            if (!adding || row != endRow) FastLED.show();
-            if (adding && row != endRow) leds[index] = CRGB::Black;
+  void animateDrop(int col, int endRow, bool adding) {
+    int step = 1; // Always moving downward
+    for (int row = (adding ? 0 : endRow); adding ? (row <= endRow) : (row < MATRIX_HEIGHT); row += step) {
+        int index = xyToIndex(col, row);
+        if (adding) {
+            leds[index] = calculateColor(row); // Set the color of the LED
+            FastLED.show(); // Update the LED strip
+            if (row != endRow) {
+                leds[index] = CRGB::Black; // Reset the animated LED if adding and not at endRow
+            }
+        } else {
+            leds[index] = CRGB::Black; // Turn the current LED off (black spot) for removing
+            FastLED.show(); // Update the LED strip
+            
+            if (row > endRow +1) {
+                int prevIndex = xyToIndex(col, row - 1);
+                leds[prevIndex] = calculateColor(row - 1); // Reset the previous LED to its original color
+            }
         }
     }
+    if(endRow != MATRIX_HEIGHT -1){
+        leds[xyToIndex(col, MATRIX_HEIGHT -1)] = calculateColor(MATRIX_HEIGHT -1);
+        FastLED.show();
+    }
+  }
+
 
     CRGB calculateColor(int y) {
         return CRGB(255 - y * 255 / MATRIX_HEIGHT, y * 255 / MATRIX_HEIGHT, 0);
