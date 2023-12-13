@@ -184,8 +184,7 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(2), sensor1, RISING);
   attachInterrupt(digitalPinToInterrupt(3), sensor2, RISING);
 
-  count = 20; //initial count value for simulation
-  //matrix.displayOccupancy(50);
+  count = 0; //change initial count value for simulation
 }
 
 void loop() {
