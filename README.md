@@ -12,6 +12,7 @@ This project was achieved by using two sensors. The sequence of the sensor being
 ## Project Housing
 A housing was designed using Onshape and laser-cutted on acrylic for assembly. This housing design allows direct mounting onto door frames.
 ![Assembly Drawing ](https://github.com/Zhang563/No-Crowded-Room/assets/60804083/e5383037-7aed-4070-a210-393a6e41237a)
+<img width="1168" alt="laser cutting parts" src="https://github.com/Zhang563/No-Crowded-Room/assets/60804083/7dfb2fb7-595b-475a-a8ce-9d328269a554">
 
 ## Highlight of this Project
 Interrupt-driven code design. This allows faster response and it is more efficient than polling. It somewhat addresses that a group of people enters the room as it can react to changes fast.
