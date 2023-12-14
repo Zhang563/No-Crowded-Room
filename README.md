@@ -27,3 +27,6 @@ It is designed for single-door rooms, i.e. classrooms as it will only account fo
 |Device Mounted on Door Frame|
 |![animation](https://github.com/Zhang563/No-Crowded-Room/assets/60804083/67c21f71-8ac5-4d1b-b39c-b543264b5f42)|
 |Demonstration of LED Matrix Animation|
+|![handwave](https://github.com/Zhang563/No-Crowded-Room/assets/60804083/ade30299-f346-4035-9f4a-0023c2c66679)|
+|Demonstration of Sensing Entering vs. Exiting|
+
