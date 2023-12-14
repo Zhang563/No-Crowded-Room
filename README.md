@@ -1,5 +1,5 @@
 # Project No Crowded Room
-> An Arduino Project Keeps Tracking How Many People Have Entered/Exited Room to Prevent Overcrowding 
+> Created A Devide Keeps Tracking How Many People Have Entered/Exited Room to Prevent Overcrowding 
 
 To prevent overcrowding in an indoor area, it is a good practice to keep an indoor place under the maximum occupancy levels. A device is developed to count people as they enter or exit the room. In addition to keeping the room within the designed capacity, the data can also be used to analyze space utilization for better classroom assignment methods or attendance tracking. This provides a wide range of use cases for this project. 
 
@@ -20,9 +20,10 @@ Interrupt-driven code design. This allows faster response and it is more efficie
 ## Limitations
 It is designed for single-door rooms, i.e. classrooms as it will only account for events at the door. If the door is wide enough that multiple people can enter and exit at the same instance, this will be less likely to account for this scenario. Future improvements like bringing interconnectivity can bring support to multi-door rooms. 
 
-## Photos
+## Gallery
 
-<img width="1109" alt="project mounted on a door frame with LED matrix and screen on" src="https://github.com/Zhang563/No-Crowded-Room/assets/60804083/19c7023b-f6ca-498b-b201-f3c1d54b982c">
-
-![animation](https://github.com/Zhang563/No-Crowded-Room/assets/60804083/67c21f71-8ac5-4d1b-b39c-b543264b5f42)
-
+|![mounted](https://github.com/Zhang563/No-Crowded-Room/assets/60804083/19c7023b-f6ca-498b-b201-f3c1d54b982c)|
+|:-:|
+|Device Mounted on Door Frame|
+|![animation](https://github.com/Zhang563/No-Crowded-Room/assets/60804083/67c21f71-8ac5-4d1b-b39c-b543264b5f42)|
+|Demonstration of LED Matrix Animation|
