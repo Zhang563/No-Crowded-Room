@@ -18,3 +18,10 @@ Interrupt-driven code design. This allows faster response and it is more efficie
 
 ## Limitations
 It is designed for single-door rooms, i.e. classrooms as it will only account for events at the door. If the door is wide enough that multiple people can enter and exit at the same instance, this will be less likely to account for this scenario. Future improvements like bringing interconnectivity can bring support to multi-door rooms. 
+
+## Photos
+
+<img width="1109" alt="project mounted on a door frame with LED matrix and screen on" src="https://github.com/Zhang563/No-Crowded-Room/assets/60804083/19c7023b-f6ca-498b-b201-f3c1d54b982c">
+
+![animation](https://github.com/Zhang563/No-Crowded-Room/assets/60804083/67c21f71-8ac5-4d1b-b39c-b543264b5f42)
+
