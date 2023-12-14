@@ -1,5 +1,5 @@
 # Project No Crowded Room
-> An Arduino Project Keeps Tracking How Many People Have Entered/Exited Room
+> An Arduino Project Keeps Tracking How Many People Have Entered/Exited Room to Prevent Overcrowding 
 
 To prevent overcrowding in an indoor area, it is a good practice to keep an indoor place under the maximum occupancy levels. A device is developed to count people as they enter or exit the room. In addition to keeping the room within the designed capacity, the data can also be used to analyze space utilization for better classroom assignment methods or attendance tracking. This provides a wide range of use cases for this project. 
 
