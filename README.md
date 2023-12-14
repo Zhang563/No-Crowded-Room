@@ -9,6 +9,10 @@ Arduino is driving a 16x16 LED matrix using FAST LED. A class structure is used 
 Using animation instead of displaying a number on the matrix provides an intuitive way for the average person to have a sense of how full the room is. Instead of knowing "there is 10 person in the room", but know "the room is half filled to its designed capacity". There is an auxiliary LCD that displays the absolute count for room administrators, or "stats for the nerds". 
 This project was achieved by using two sensors. The sequence of the sensor being triggered determines whether the person is entering or exiting. The data will be passed to the LCD screen and LED matrix.
 
+## Project Circuits
+<img width="970" alt="image" src="https://github.com/Zhang563/No-Crowded-Room/assets/60804083/841906d4-34cc-4468-9d29-ebb95a985083">
+
+
 ## Project Housing
 A housing was designed using Onshape and laser-cutted on acrylic for assembly. This housing design allows direct mounting onto door frames.
 ![Assembly Drawing ](https://github.com/Zhang563/No-Crowded-Room/assets/60804083/e5383037-7aed-4070-a210-393a6e41237a)
